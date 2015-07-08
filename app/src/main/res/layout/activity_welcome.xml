@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/Btn_go"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="100dp"
+            android:text="直接进入"/>
+        <Button
+            android:id="@+id/Btn_countgo"
+            android:layout_marginTop="30dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="倒计时进入"/>
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/layout_countdown"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#e0000000"
+        android:visibility="gone">
+        <ImageView
+            android:id="@+id/iv_countdown_num"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/countdown_num5"/>
+        <TextView
+            android:id="@+id/tv_countdown_tips1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/iv_countdown_num"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="13dp"
+            android:textColor="#828282"
+            android:textSize="18sp"
+            android:text="点击数字开始骑行"/>
+        <TextView
+            android:id="@+id/tv_countdown_tips2"
+            android:layout_below="@+id/tv_countdown_tips1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="22sp"
+            android:textColor="#cacaca"
+            android:layout_marginTop="20dp"
+            android:layout_centerHorizontal="true"
+            android:text="超省电模式"/>
+        <ImageView
+            android:id="@+id/iv_save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/tv_countdown_tips2"
+            android:layout_marginLeft="10dp"
+            android:layout_alignTop="@+id/tv_countdown_tips2"/>
+    </RelativeLayout>
+</FrameLayout>

@@ -1,0 +1,27 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.musicplayer">
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <!--android:configChanges的作用是防止按电源键锁屏，会关闭activity，从而导致关闭service-->
+    <application android:allowBackup="true" android:label="@string/app_name"
+        android:icon="@mipmap/ic_launcher" android:theme="@style/AppTheme">
+        <activity android:name=".activity.WelcomeActivity"
+            android:screenOrientation="landscape"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+        <activity android:name=".activity.CountdownActivity"
+            android:screenOrientation="landscape"
+            android:label="@string/app_name">
+
+            </activity>
+        <activity android:name=".activity.PlayerActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:screenOrientation="landscape"
+            android:label="@string/app_name">
+            </activity>
+        <service android:name=".service.MusicService"></service>
+    </application>
+</manifest>

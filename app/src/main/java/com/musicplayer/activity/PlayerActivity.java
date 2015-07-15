@@ -37,6 +37,9 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
     //扫描歌曲按钮
     private ImageButton imgBtn_music_scan;
 
+    //播放列表
+    private ImageButton imgBtn_music_list;
+
     //专辑封面
     private RoundImageView rdiv_song_cover;
 
@@ -122,6 +125,7 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
         tv_song_artist = (TextView)findViewById(R.id.tv_song_artist);
         tv_song_time = (TextView)findViewById(R.id.tv_song_time);
 
+        imgBtn_music_list = (ImageButton)findViewById(R.id.imgBtn_music_list);
         imgBtn_music_close = (ImageButton)findViewById(R.id.imgBtn_music_close);
         imgBtn_music_scan = (ImageButton)findViewById(R.id.imgBtn_music_scan);
         imgBtn_music_last = (ImageButton)findViewById(R.id.imgBtn_control_last);
@@ -129,6 +133,7 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
         imgBtn_music_next = (ImageButton)findViewById(R.id.imgBtn_control_next);
         imgBtn_music_model = (ImageButton)findViewById(R.id.imgBtn_music_model);
 
+        imgBtn_music_list.setOnClickListener(this);
         imgBtn_music_close.setOnClickListener(this);
         imgBtn_music_scan.setOnClickListener(this);
         imgBtn_music_last.setOnClickListener(this);
@@ -261,6 +266,10 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
                 break;
             case R.id.imgBtn_music_close:
                 finish();
+                break;
+            case R.id.imgBtn_music_list:
+                Intent intent = new Intent(this, MusicListActivity.class);
+                startActivity(intent);
             default:
                 break;
         }

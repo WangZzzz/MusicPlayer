@@ -39,6 +39,9 @@ public class MusicUtils {
     //单曲循环模式
     public static final int MODEL_SINGLE = 6;
 
+    //更新播放列表
+    public static final int UPDATE_MUSIC_LIST = 7;
+
     public static final String SP_NAME = "MUSIC_MODEL";
     //activity发送到service的广播名称
     public static final String MUSIC_RECEIVER_INTENT = "com.mtt.music.control";
@@ -127,7 +130,7 @@ public class MusicUtils {
                 //歌曲文件的大小 ：MediaStore.Audio.Media.SIZE
                 long size = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.SIZE));
 
-                if((size > 1024*2048) && url.endsWith("mp3")) {//大于2M并且只能是mp3格式的，防止不兼容
+                if((size > 1024*3072) && url.endsWith("mp3")) {//大于2M并且只能是mp3格式的，防止不兼容
                     String query = "insert into song (id,title,album,album_id,artist,url,duration,size) values(?,?,?,?,?,?,?,?)";
                     dbHelper.execSQL(query, new Object[]{id, title, album,album_id, artist, url, duration, size});
                 }

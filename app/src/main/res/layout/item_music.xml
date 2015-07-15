@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android" >
+    <TextView
+        android:layout_marginTop="5dp"
+        android:layout_marginLeft="10dp"
+        android:id="@+id/tv_musicitem_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="18dp"
+        android:text="我不愿让你一个人"/>
+    <TextView
+        android:id="@+id/tv_musicitem_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_musicitem_title"
+        android:layout_marginTop="3dp"
+        android:layout_marginLeft="50dp"
+        android:textSize="15dp"
+        android:text="5:00"/>
+    <TextView
+        android:id="@+id/tv_musicitem_artist"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="五月天"
+        android:textSize="15dp"
+        android:layout_alignTop="@+id/tv_musicitem_time"
+        android:layout_toRightOf="@+id/tv_musicitem_time"
+        android:layout_marginLeft="20dp"/>
+    </RelativeLayout>

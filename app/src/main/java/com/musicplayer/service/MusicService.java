@@ -169,6 +169,7 @@ public class MusicService extends Service {
      */
     private boolean initList(){
         Cursor cursor = dbHelper.querySQL("select * from song", null);
+        songList.clear();
         if(cursor.moveToFirst()){
             Log.d("MainActivity", "true");
             do{
@@ -393,6 +394,9 @@ public class MusicService extends Service {
                     case MusicUtils.MUSICE_SERVICE_STOP:
                         Log.d("MusicServie", "MUSICE_SERVICE_STOP");
                         stopSelf();
+                        break;
+                    case MusicUtils.UPDATE_MUSIC_LIST:
+                        initList();
                         break;
                     default:
                         break;

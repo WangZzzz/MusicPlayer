@@ -37,6 +37,28 @@ public class MusicListActivity extends Activity {
         setContentView(R.layout.activity_musiclistactivity);
         initView();
         initData();
+     /*   AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("音乐列表");
+        builder.setAdapter(adapter, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                Songinfo songinfo = songList.get(i);
+//                Toast.makeText(MusicListActivity.this, songinfo.getTitle(), Toast.LENGTH_SHORT).show();
+            }
+        });
+        builder.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                Songinfo songinfo = songList.get(i);
+                Toast.makeText(MusicListActivity.this, songinfo.getTitle(), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+        builder.show();*/
     }
 
     private void initView(){
@@ -73,6 +95,20 @@ public class MusicListActivity extends Activity {
                 });
                 builder.show();
                 return false;
+            }
+        });
+
+        lv_music_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Songinfo songinfo = songList.get(i);
+                //点击播放列表的歌曲，直接播放
+                Intent intent = new Intent();
+                intent.setAction(MusicUtils.MUSIC_RECEIVER_INTENT);
+                intent.putExtra("control", MusicUtils.PLAY_MUSIC_LIST);
+                intent.putExtra("music_id", songinfo.getId());
+                sendBroadcast(intent);
+                finish();
             }
         });
     }

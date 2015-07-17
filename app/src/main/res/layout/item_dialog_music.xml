@@ -3,9 +3,14 @@
     android:layout_width="match_parent"
     android:orientation="vertical"
     android:layout_height="match_parent">
-    <Button
-        android:id="@+id/btn_test"
+    <TextView
+        android:id="@+id/tv_dialog_musictitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="测试"/>
+        android:gravity="center_horizontal"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:text="我不愿让你一个人"
+        android:textSize="20sp"/>
+
 </LinearLayout>

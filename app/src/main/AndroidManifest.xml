@@ -25,9 +25,9 @@
         <service android:name=".service.MusicService"></service>
         <activity android:name=".activity.MusicListActivity"
             android:label="音乐列表">
-
             </activity>
         <activity android:name=".activity.TestActivity"
+            android:screenOrientation="landscape"
             android:label="音乐列表"/>
     </application>
 </manifest>

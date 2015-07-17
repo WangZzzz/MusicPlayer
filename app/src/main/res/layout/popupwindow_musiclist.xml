@@ -2,15 +2,18 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
+    android:background="#fff"
     android:layout_height="match_parent">
     <TextView
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
         android:text="音乐列表"
-        android:textSize="20sp"/>
+        android:textSize="23sp"/>
     <ListView
-        android:id="@+id/lv_music_list"
+        android:id="@+id/lv_window_musiclist"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 

@@ -1,28 +1,41 @@
 package com.musicplayer.activity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.ImageButton;
+import android.widget.ListView;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.musicplayer.R;
+import com.musicplayer.adapter.MusicListAdapter;
 import com.musicplayer.db.MusicDbHelper;
+import com.musicplayer.model.Songinfo;
 import com.musicplayer.service.MusicService;
 import com.musicplayer.util.MusicUtils;
 import com.musicplayer.view.MyDialog;
 import com.musicplayer.view.RoundImageView;
+
+import java.util.ArrayList;
 
 /**
  * Created by WangZ on 2015/7/1.
@@ -89,6 +102,13 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
 
     //标识是否正在播放音乐
     private boolean isPlaying = false;
+
+    //以下是popupwindow需要的：
+    private ListView lv_window_musiclist;
+    private ArrayList<Songinfo> songList = new ArrayList<Songinfo>();
+    private MusicListAdapter adapter;
+    private PopupWindow popupWindow;
+    private View view;
 
     private Handler handler = new Handler(){
         @Override
@@ -171,6 +191,7 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(MusicUtils.UPDATE_SONGINFO_INTENT);
         intentFilter.addAction(MusicUtils.UPDATE_SONGPROGRESS_INTENT);
+        intentFilter.addAction(MusicUtils.UPDATE_PLAY_BUTTON);
         registerReceiver(songInfoRecevier, intentFilter);
     }
 
@@ -268,8 +289,8 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
                 finish();
                 break;
             case R.id.imgBtn_music_list:
-                Intent intent = new Intent(this, MusicListActivity.class);
-                startActivity(intent);
+                showWindow(view);
+                break;
             default:
                 break;
         }
@@ -346,7 +367,116 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
                     String content = MusicUtils.formatDuration(progress) + " / " + MusicUtils.formatDuration(song_duration);
                     tv_song_time.setText(content);
                 }
+            }else if(action.equals(MusicUtils.UPDATE_PLAY_BUTTON)){
+                Log.d(PlayerActivity.this.getClass().getSimpleName(), "UPDATE_PLAY_BUTTON");
+                isPlaying = true;
+                tv_music_status.setText("");
+                tv_music_status.setText("正在播放");
+                imgBtn_music_play.setBackground(null);
+                imgBtn_music_play.setImageResource(R.drawable.music_control_pause);
             }
         }
+    }
+
+    private void showWindow(View parent){
+        if(popupWindow == null) {
+            LayoutInflater layoutInflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+            view = layoutInflater.inflate(R.layout.popupwindow_musiclist, null);
+            lv_window_musiclist = (ListView) view.findViewById(R.id.lv_window_musiclist);
+            initSongList();
+            adapter = new MusicListAdapter(PlayerActivity.this, R.layout.item_music, songList);
+            lv_window_musiclist.setAdapter(adapter);
+            popupWindow = new PopupWindow(view, 800, 1000);
+        }
+        // 使其聚集
+        popupWindow.setFocusable(true);
+        // 设置允许在外点击消失
+        popupWindow.setOutsideTouchable(true);
+
+        // 这个是为了点击“返回Back”也能使其消失，并且并不会影响你的背景
+        popupWindow.setBackgroundDrawable(new BitmapDrawable());
+        WindowManager windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
+        //居中显示
+        popupWindow.showAtLocation(parent, Gravity.CENTER, 0, 0);
+
+        lv_window_musiclist.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                final Songinfo songinfo = songList.get(i);
+                AlertDialog.Builder builder = new AlertDialog.Builder(PlayerActivity.this);
+                builder.setCancelable(false);
+                builder.setMessage("删除所选歌曲？");
+                builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        deleteFromdb(songinfo.getId());
+                        initSongList();
+                        adapter.notifyDataSetChanged();
+                        sendMusicBroadCast(MusicUtils.UPDATE_MUSIC_LIST);
+                    }
+                });
+                builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                });
+                builder.show();
+                return true;
+            }
+        });
+
+        lv_window_musiclist.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Songinfo songinfo = songList.get(i);
+                //点击播放列表的歌曲，直接播放
+                Intent intent = new Intent();
+                intent.setAction(MusicUtils.MUSIC_RECEIVER_INTENT);
+                intent.putExtra("control", MusicUtils.PLAY_MUSIC_LIST);
+                intent.putExtra("music_id", songinfo.getId());
+                sendBroadcast(intent);
+                popupWindow.dismiss();
+            }
+        });
+    }
+
+    private void initSongList(){
+        if(dbHelper == null)
+            dbHelper = new MusicDbHelper(this, "Music", null, 1);
+        Cursor cursor = dbHelper.querySQL("select * from song", null);
+        songList.clear();
+        if(cursor.moveToFirst()){
+            Log.d("MainActivity", "true");
+            do{
+                long id = cursor.getLong(cursor.getColumnIndex("id"));
+                String title = cursor.getString(cursor.getColumnIndex("title"));
+                String album = cursor.getString(cursor.getColumnIndex("album"));
+                long album_id = cursor.getLong(cursor.getColumnIndex("album_id"));
+                String artist = cursor.getString(cursor.getColumnIndex("artist"));
+                String url = cursor.getString(cursor.getColumnIndex("url"));
+                int duration = cursor.getInt(cursor.getColumnIndex("duration"));
+                long size = cursor.getLong(cursor.getColumnIndex("size"));
+//                Log.d("MainActivity", title + " @ " + url);
+                Songinfo songinfo = new Songinfo();
+                songinfo.setId(id);
+                songinfo.setTitle(title);
+                songinfo.setAlbum(album);
+                songinfo.setAlbum_id(album_id);
+                songinfo.setArtist(artist);
+                songinfo.setUrl(url);
+                songinfo.setDuration(duration);
+                songinfo.setSize(size);
+                songList.add(songinfo);
+            }while(cursor.moveToNext());
+        }else{
+            Toast.makeText(this, "没有初始化播放列表...", Toast.LENGTH_SHORT).show();
+            return;
+        }
+    }
+
+    private void deleteFromdb(long id){
+        String sql = "delete from song where id = " + id;
+        dbHelper.execSQL(sql, null);
     }
 }

@@ -398,6 +398,33 @@ public class MusicService extends Service {
                     case MusicUtils.UPDATE_MUSIC_LIST:
                         initList();
                         break;
+                    case MusicUtils.PLAY_MUSIC_LIST:
+                        if(mediaPlayer != null) {
+                            if (mediaPlayer.isPlaying()) {
+                                mediaPlayer.stop();
+                            }
+                            mediaPlayer.reset();
+                        }
+                        long music_id = intent.getLongExtra("music_id", -1);
+                        if(music_id == -1){
+                            break;
+                        }else{
+                            int index = 0;
+                            for(Songinfo songinfo : songList){
+                                if(songinfo.getId() == music_id){
+                                    PrepareSource(index);
+                                    mediaPlayer.start();
+                                    //还需要把前端界面播放按钮状态更新
+                                    Intent intent1 = new Intent();
+                                    intent1.setAction(MusicUtils.UPDATE_PLAY_BUTTON);
+                                    sendBroadcast(intent1);
+                                    updateSongInfo(songinfo);
+                                    updateProgress();
+                                }else{
+                                    index++;
+                                }
+                            }
+                        }
                     default:
                         break;
                 }

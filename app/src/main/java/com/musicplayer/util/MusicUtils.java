@@ -42,6 +42,11 @@ public class MusicUtils {
     //更新播放列表
     public static final int UPDATE_MUSIC_LIST = 7;
 
+    //点击播放列表直接播放
+    public static final int PLAY_MUSIC_LIST = 8;
+
+
+
     public static final String SP_NAME = "MUSIC_MODEL";
     //activity发送到service的广播名称
     public static final String MUSIC_RECEIVER_INTENT = "com.mtt.music.control";
@@ -50,6 +55,9 @@ public class MusicUtils {
     public static final String UPDATE_SONGINFO_INTENT = "com.mtt.songinfo.update";
     //service发送到activity的更新进度的广播名称
     public static final String UPDATE_SONGPROGRESS_INTENT = "com.mtt.songprogress.update";
+
+    //更新前端播放按钮
+    public static final String UPDATE_PLAY_BUTTON = "com.mtt.update.playbutton";
 
     private static final Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
     private static final BitmapFactory.Options sBitmapOptions = new BitmapFactory.Options();

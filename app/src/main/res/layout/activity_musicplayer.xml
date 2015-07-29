@@ -2,7 +2,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    xmlns:android="http://schemas.android.com/apk/res/android" >
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <RelativeLayout
         android:layout_width="match_parent"
         android:background="#262626"
@@ -79,6 +80,7 @@
                 android:textSize="22sp"
                 android:textColor="#f34949"
                 android:layout_marginTop="50dp"
+                android:text="未知"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
             <TextView
@@ -89,6 +91,7 @@
                 android:layout_marginTop="20dp"
                 android:textSize="22sp"
                 android:textColor="#f34949"
+                android:text="未知歌手"
                 android:layout_below="@+id/tv_song_title"/>
             <TextView
                 android:id="@+id/tv_song_time"
@@ -98,8 +101,9 @@
                 android:layout_height="wrap_content"
                 android:textSize="18sp"
                 android:textColor="#ffffff"
+                android:text="00:00"
                 android:layout_alignParentRight="true"
-                android:layout_marginRight="25dp"/>
+                android:layout_marginRight="70dp"/>
             </RelativeLayout>
         <RelativeLayout
             android:layout_width="match_parent"
@@ -115,12 +119,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_toLeftOf="@+id/imgBtn_control_play"
+                android:layout_centerVertical="true"
                 android:layout_marginRight="60dp"
                 android:background="@drawable/music_control_last" />
             <ImageButton
                 android:id="@+id/imgBtn_control_play"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
                 android:background="@drawable/music_control_play"
                 android:layout_centerHorizontal="true" />
             <ImageButton
@@ -129,14 +135,24 @@
                 android:layout_marginLeft="60dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
                 android:background="@drawable/music_control_next"/>
             <ImageButton
                 android:id="@+id/imgBtn_music_model"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_toRightOf="@+id/imgBtn_control_next"
-                android:layout_marginLeft="50dp"
+                android:layout_marginLeft="20dp"
+                android:layout_centerVertical="true"
                 android:background="@drawable/music_model_normal"/>
+            <ImageButton
+                android:id="@+id/imgBtn_control_volume"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/imgBtn_music_model"
+                android:layout_marginLeft="20dp"
+                android:layout_centerVertical="true"
+                android:background="@drawable/music_control_volume"/>
         </RelativeLayout>
         <LinearLayout
             android:layout_width="match_parent"

@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.graphics.drawable.BitmapDrawable;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -23,6 +24,7 @@ import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.PopupWindow;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -108,7 +110,19 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
     private ArrayList<Songinfo> songList = new ArrayList<Songinfo>();
     private MusicListAdapter adapter;
     private PopupWindow popupWindow;
+    private PopupWindow VolumePopupWindow;
     private View view;
+
+    //音量按钮，单击弹出seekbar
+    private ImageButton imgBtn_music_volume;
+    private boolean isVolumeShown = false;
+    private SeekBar sb_music_volume;
+    private View volumeView;
+    private View parentView;
+
+    private AudioManager audioManager;
+    private int currentVolume;
+    private int maxVolume;
 
     private Handler handler = new Handler(){
         @Override
@@ -134,6 +148,7 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_musicplayer);
+        parentView = LayoutInflater.from(this).inflate(R.layout.activity_musicplayer, null);
         initView();
         initData();
     }
@@ -152,6 +167,8 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
         imgBtn_music_play = (ImageButton)findViewById(R.id.imgBtn_control_play);
         imgBtn_music_next = (ImageButton)findViewById(R.id.imgBtn_control_next);
         imgBtn_music_model = (ImageButton)findViewById(R.id.imgBtn_music_model);
+        imgBtn_music_volume = (ImageButton)findViewById(R.id.imgBtn_control_volume);
+
 
         imgBtn_music_list.setOnClickListener(this);
         imgBtn_music_close.setOnClickListener(this);
@@ -160,6 +177,8 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
         imgBtn_music_play.setOnClickListener(this);
         imgBtn_music_next.setOnClickListener(this);
         imgBtn_music_model.setOnClickListener(this);
+        imgBtn_music_volume.setOnClickListener(this);
+        imgBtn_music_volume.setOnClickListener(this);
     }
 
     private void initData(){
@@ -175,6 +194,10 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
             showScanDialog();
         }
         registerSongInfoReceiver();
+        audioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+        currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+        maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+        Log.i(PlayerActivity.this.getClass().getSimpleName(), maxVolume + "");
     }
 
     private void initDialog(){
@@ -291,6 +314,23 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
             case R.id.imgBtn_music_list:
                 showWindow(view);
                 break;
+            case R.id.imgBtn_control_volume:
+/*                if(!isVolumeShown){
+                    isVolumeShown = true;
+                    showVolumeWindow(view);
+                }else{
+                    isVolumeShown = false;
+                    VolumePopupWindow.dismiss();
+                }*/
+                if(VolumePopupWindow != null){
+                    if(!VolumePopupWindow.isShowing()){
+                        showVolumeWindow(view);
+                    }else{
+                        VolumePopupWindow.dismiss();
+                    }
+                }else{
+                    showVolumeWindow(view);
+                }
             default:
                 break;
         }
@@ -378,6 +418,10 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
         }
     }
 
+    /**
+     * 显示音乐播放列表的popupwindow
+     * @param parent
+     */
     private void showWindow(View parent){
         if(popupWindow == null) {
             LayoutInflater layoutInflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
@@ -478,5 +522,48 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
     private void deleteFromdb(long id){
         String sql = "delete from song where id = " + id;
         dbHelper.execSQL(sql, null);
+    }
+
+    /**
+     * 显示音量的popupwindow
+     */
+    private void showVolumeWindow(View parent) {
+        if (VolumePopupWindow == null) {
+            LayoutInflater layoutInflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+            volumeView = layoutInflater.inflate(R.layout.popupwindow_musicvolume, null);
+            sb_music_volume = (SeekBar) volumeView.findViewById(R.id.sb_music_volume);
+            VolumePopupWindow = new PopupWindow(volumeView, 800, 150);
+        }
+        // 使其聚集
+        VolumePopupWindow.setFocusable(true);
+        // 设置允许在外点击消失
+        VolumePopupWindow.setOutsideTouchable(true);
+
+        // 这个是为了点击“返回Back”也能使其消失，并且并不会影响你的背景
+        VolumePopupWindow.setBackgroundDrawable(new BitmapDrawable());
+        WindowManager windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
+        //居中显示
+        VolumePopupWindow.showAtLocation(parent, Gravity.CENTER, 0, 0);
+
+        sb_music_volume.setMax(maxVolume);
+        currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+        sb_music_volume.setProgress(currentVolume);
+
+        sb_music_volume.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, progress, 0);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
     }
 }

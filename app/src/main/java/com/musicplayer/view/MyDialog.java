@@ -17,8 +17,8 @@ public class MyDialog extends AlertDialog implements View.OnClickListener {
 
     private Context context;
     private TextView tv_dlg_content;
-    private Button btn_dlg_yes;
-    private Button btn_dlg_no;
+    private Button btn_dlg_all;
+    private Button btn_dlg_customed;
     private String content;
     private CustomDialogListener customDialogListener;
 
@@ -44,12 +44,12 @@ public class MyDialog extends AlertDialog implements View.OnClickListener {
 
     private void initView(){
         tv_dlg_content = (TextView)findViewById(R.id.tv_dlg_content);
-        btn_dlg_yes = (Button)findViewById(R.id.btn_dlg_yes);
-        btn_dlg_no = (Button)findViewById(R.id.btn_dlg_no);
+        btn_dlg_all = (Button)findViewById(R.id.btn_dlg_all);
+        btn_dlg_customed = (Button)findViewById(R.id.btn_dlg_customed);
 
         tv_dlg_content.setText(content);
-        btn_dlg_yes.setOnClickListener(this);
-        btn_dlg_no.setOnClickListener(this);
+        btn_dlg_all.setOnClickListener(this);
+        btn_dlg_customed.setOnClickListener(this);
     }
 
     @Override

@@ -342,7 +342,7 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
             @Override
             public void OnClick(View v) {
                 switch (v.getId()){
-                    case R.id.btn_dlg_yes:
+                    case R.id.btn_dlg_all:
                         if(dialog != null){
                             dialog.show();
                         }
@@ -354,8 +354,10 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
                         }
                        scanSongList();
                         break;
-                    case R.id.btn_dlg_no:
-                        Toast.makeText(PlayerActivity.this, "取消扫描", Toast.LENGTH_SHORT).show();
+                    case R.id.btn_dlg_customed:
+//                        Toast.makeText(PlayerActivity.this, "取消扫描", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(PlayerActivity.this, ScanFileActivity.class);
+                        startActivity(intent);
                         break;
                     default:
                         break;

@@ -32,22 +32,22 @@
         >
 
         <Button
-            android:id="@+id/btn_dlg_no"
+            android:id="@+id/btn_dlg_customed"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="取消"
+            android:text="自定义扫描"
             android:textSize="16sp"
             android:textColor="#333"
             android:gravity="center"
             />
 
         <Button
-            android:id="@+id/btn_dlg_yes"
+            android:id="@+id/btn_dlg_all"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="确定"
+            android:text="全盘扫描"
             android:textSize="16sp"
             android:textColor="#333"
             android:gravity="center"

@@ -113,7 +113,7 @@ public class MusicService extends Service {
     private void registerMusicReceiver(){
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("android.intent.action.ANSWER");
-        intentFilter.addAction(MusicUtils.MUSIC_RECEIVER_INTENT);
+        intentFilter.addAction(MusicUtils.MUSIC_SERVIE_CONTROL);
         registerReceiver(musicControlReceiver, intentFilter);
     }
 
@@ -354,7 +354,7 @@ public class MusicService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            if (action.equals(MusicUtils.MUSIC_RECEIVER_INTENT)) {
+            if (action.equals(MusicUtils.MUSIC_SERVIE_CONTROL)) {
                 int control = intent.getIntExtra("control", -1);
                 switch (control) {
                     //根据用户传来的不同的参数执行不同的操作

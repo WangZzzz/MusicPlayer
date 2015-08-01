@@ -94,7 +94,7 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
     private boolean isPrepared = false;
 
     //接收后台音乐服务发送过来的广播信息
-    private SongInfoRecevier songInfoRecevier = new SongInfoRecevier();
+    private PlayerActivityRecevier recevier = new PlayerActivityRecevier();
 
     //扫描音乐时，显示的进度dialog
     private ProgressDialog dialog;
@@ -215,7 +215,7 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
         intentFilter.addAction(MusicUtils.UPDATE_SONGINFO_INTENT);
         intentFilter.addAction(MusicUtils.UPDATE_SONGPROGRESS_INTENT);
         intentFilter.addAction(MusicUtils.UPDATE_PLAY_BUTTON);
-        registerReceiver(songInfoRecevier, intentFilter);
+        registerReceiver(recevier, intentFilter);
     }
 
 
@@ -236,7 +236,7 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
     protected void onDestroy() {
         super.onDestroy();
         Log.d("PlayerActivity", "onDestory");
-        unregisterReceiver(songInfoRecevier);
+        unregisterReceiver(recevier);
         sendMusicBroadCast(MusicUtils.MUSICE_SERVICE_STOP);
     }
 
@@ -382,12 +382,12 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
     //向后台播放音乐的服务发送广播
     private void sendMusicBroadCast(int i){
         Intent intent = new Intent();
-        intent.setAction(MusicUtils.MUSIC_RECEIVER_INTENT);
+        intent.setAction(MusicUtils.MUSIC_SERVIE_CONTROL);
         intent.putExtra("control", i);
         sendBroadcast(intent);
     }
 
-    private class SongInfoRecevier extends BroadcastReceiver {
+    private class PlayerActivityRecevier extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -429,11 +429,12 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
             LayoutInflater layoutInflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
             view = layoutInflater.inflate(R.layout.popupwindow_musiclist, null);
             lv_window_musiclist = (ListView) view.findViewById(R.id.lv_window_musiclist);
-            initSongList();
             adapter = new MusicListAdapter(PlayerActivity.this, R.layout.item_music, songList);
             lv_window_musiclist.setAdapter(adapter);
             popupWindow = new PopupWindow(view, 800, 1000);
         }
+        initSongList();
+        adapter.notifyDataSetChanged();
         // 使其聚集
         popupWindow.setFocusable(true);
         // 设置允许在外点击消失
@@ -455,7 +456,7 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
                 builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        deleteFromdb(songinfo.getId());
+                        deleteFromdb(songinfo.getTitle());
                         initSongList();
                         adapter.notifyDataSetChanged();
                         sendMusicBroadCast(MusicUtils.UPDATE_MUSIC_LIST);
@@ -478,7 +479,7 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
                 Songinfo songinfo = songList.get(i);
                 //点击播放列表的歌曲，直接播放
                 Intent intent = new Intent();
-                intent.setAction(MusicUtils.MUSIC_RECEIVER_INTENT);
+                intent.setAction(MusicUtils.MUSIC_SERVIE_CONTROL);
                 intent.putExtra("control", MusicUtils.PLAY_MUSIC_LIST);
                 intent.putExtra("music_id", songinfo.getId());
                 sendBroadcast(intent);
@@ -521,8 +522,8 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
         }
     }
 
-    private void deleteFromdb(long id){
-        String sql = "delete from song where id = " + id;
+    private void deleteFromdb(String title){
+        String sql = "delete from song where title = '" + title + "'";
         dbHelper.execSQL(sql, null);
     }
 

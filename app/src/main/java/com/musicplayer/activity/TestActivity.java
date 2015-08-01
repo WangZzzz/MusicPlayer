@@ -96,7 +96,7 @@ public class TestActivity extends Activity {
                 Songinfo songinfo = songList.get(i);
                 //点击播放列表的歌曲，直接播放
                 Intent intent = new Intent();
-                intent.setAction(MusicUtils.MUSIC_RECEIVER_INTENT);
+                intent.setAction(MusicUtils.MUSIC_SERVIE_CONTROL);
                 intent.putExtra("control", MusicUtils.PLAY_MUSIC_LIST);
                 intent.putExtra("music_id", songinfo.getId());
                 sendBroadcast(intent);
@@ -168,7 +168,7 @@ public class TestActivity extends Activity {
                 Songinfo songinfo = songList.get(i);
                 //点击播放列表的歌曲，直接播放
                 Intent intent = new Intent();
-                intent.setAction(MusicUtils.MUSIC_RECEIVER_INTENT);
+                intent.setAction(MusicUtils.MUSIC_SERVIE_CONTROL);
                 intent.putExtra("control", MusicUtils.PLAY_MUSIC_LIST);
                 intent.putExtra("music_id", songinfo.getId());
                 sendBroadcast(intent);
@@ -220,7 +220,7 @@ public class TestActivity extends Activity {
     //向后台播放音乐的服务发送广播
     private void sendMusicBroadCast(int i){
         Intent intent = new Intent();
-        intent.setAction(MusicUtils.MUSIC_RECEIVER_INTENT);
+        intent.setAction(MusicUtils.MUSIC_SERVIE_CONTROL);
         intent.putExtra("control", i);
         sendBroadcast(intent);
     }

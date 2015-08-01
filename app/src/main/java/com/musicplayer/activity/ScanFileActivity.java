@@ -2,8 +2,12 @@ package com.musicplayer.activity;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -15,6 +19,7 @@ import android.widget.Toast;
 import com.musicplayer.R;
 import com.musicplayer.adapter.FileAdapter;
 import com.musicplayer.model.ScanFile;
+import com.musicplayer.util.MusicUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -25,6 +30,9 @@ public class ScanFileActivity extends Activity implements View.OnClickListener{
     private ArrayList<ScanFile> scanFiles = new ArrayList<ScanFile>();
     private TextView tv_currentpath;
     private ListView lv_scan_files;
+
+    //记录歌曲的名称，做过滤用
+    private ArrayList<String> titles = new ArrayList<String>();
 
     //返回键
     private ImageButton imgBtn_scanfile_back;
@@ -37,6 +45,18 @@ public class ScanFileActivity extends Activity implements View.OnClickListener{
 
     //记录当前路径
     private String currentPath;
+
+    private Handler handler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            dialog.dismiss();
+            Toast.makeText(ScanFileActivity.this, "扫描完成", Toast.LENGTH_SHORT).show();
+            Log.i(ScanFileActivity.this.getClass().getSimpleName(), "" + titles.size());
+            sendMusicBroadCast(MusicUtils.UPDATE_MUSIC_LIST);
+            finish();
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +117,17 @@ public class ScanFileActivity extends Activity implements View.OnClickListener{
             case R.id.bt_startscan:
                 Toast.makeText(ScanFileActivity.this, "开始扫描", Toast.LENGTH_SHORT).show();
                 dialog.show();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        for(ScanFile scanFile : scanFiles){
+                            if(scanFile.isChosen()){
+                                scanFile(new File(scanFile.getFilePath()));
+                            }
+                        }
+                        handler.sendEmptyMessage(1);
+                    }
+                }).start();
                 break;
             case R.id.imgBtn_scanfile_back:
                 if(currentPath.endsWith("/")){
@@ -157,5 +188,42 @@ public class ScanFileActivity extends Activity implements View.OnClickListener{
         dialog.setCanceledOnTouchOutside(false);
         dialog.setMessage("扫描中，请稍后...");
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+    }
+
+    private void scanFile(File rootFile){
+        for(int i=0; i< rootFile.listFiles().length; i++) {
+            File childFile = rootFile.listFiles()[i];
+
+            //假如是目录的话就继续调用getSDcardFile（）将childFile作为参数传递的方法里面
+            if (childFile.isDirectory()) {
+                scanFile(childFile);
+            } else {
+//                Log.i("ScanFileActivity", "@" + childFile.getName());
+                //如果是文件的话，判断是不是以.mp3结尾，是就加入到List里面
+                if (childFile.getName().endsWith(".mp3")) {
+//                    Log.i("ScanFileActivity", childFile.getName());
+                    titles.add(getSongTitle(childFile.getName()));
+                    MusicUtils.scanSongs(ScanFileActivity.this, titles);
+                }
+            }
+        }
+    }
+
+    /**
+     * 将文件名后面的.mp3去掉
+     * @param str
+     * @return
+     */
+    private String getSongTitle(String str){
+        int index = str.indexOf(".mp3");
+        return str.substring(0, index);
+    }
+
+    //向前台音乐界面发送广播更新播放列表
+    private void sendMusicBroadCast(int i){
+        Intent intent = new Intent();
+        intent.setAction(MusicUtils.MUSIC_SERVIE_CONTROL);
+        intent.putExtra("control", i);
+        sendBroadcast(intent);
     }
 }

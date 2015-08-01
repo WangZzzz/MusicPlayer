@@ -19,6 +19,7 @@ import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 
 /**
  * Created by WangZ on 2015/6/30.
@@ -49,7 +50,7 @@ public class MusicUtils {
 
     public static final String SP_NAME = "MUSIC_MODEL";
     //activity发送到service的广播名称
-    public static final String MUSIC_RECEIVER_INTENT = "com.mtt.music.control";
+    public static final String MUSIC_SERVIE_CONTROL = "com.mtt.music.control";
 
     //service发送到activity的更新歌曲信息的广播名称
     public static final String UPDATE_SONGINFO_INTENT = "com.mtt.songinfo.update";
@@ -145,6 +146,62 @@ public class MusicUtils {
             }while (cursor.moveToNext());
         }
     }
+
+    public static void scanSongs(Context context, ArrayList<String> titles){
+        MusicDbHelper dbHelper = new MusicDbHelper(context, "Music", null, 1);
+/*        String sql = "delete from song";
+        dbHelper.execSQL(sql, null);*/
+        Cursor cursor = context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null, null, null, MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
+        //遍历媒体库
+        if(cursor.moveToFirst()){
+            do{
+                //歌曲编号
+                long id = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID));
+                //歌曲标题
+                String title = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE));
+                //歌曲的专辑名：MediaStore.Audio.Media.ALBUM
+                String album = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM));
+                long album_id = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));
+                //歌曲的歌手名： MediaStore.Audio.Media.ARTIST
+                String artist = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST));
+                //歌曲文件的路径 ：MediaStore.Audio.Media.DATA
+                String url = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA));
+                //歌曲的总播放时长 ：MediaStore.Audio.Media.DURATION
+                int duration = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION));
+                //歌曲文件的大小 ：MediaStore.Audio.Media.SIZE
+                long size = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.SIZE));
+
+//                Log.i("MusicUtils", title);
+
+                if((size > 1024*3072) && url.endsWith("mp3") && mp3Filter(dbHelper, titles, title)) {//大于2M并且只能是mp3格式的，防止不兼容
+                    String query = "insert into song (id,title,album,album_id,artist,url,duration,size) values(?,?,?,?,?,?,?,?)";
+                    dbHelper.execSQL(query, new Object[]{id, title, album,album_id, artist, url, duration, size});
+                }
+            }while (cursor.moveToNext());
+        }
+    }
+
+    /**
+     * 查看数据库中是否已经有的数据中是否包含用户自定义扫描的数据，同时查看扫描到的音乐是否在用户自定义的列表中
+     */
+    private static boolean mp3Filter(MusicDbHelper dbHelper, ArrayList<String> titles, String title){
+        if(titles.contains(title)){
+            String sql = "select * from song where title = '" + title +"'";
+            Log.i("MusicUtils", sql);
+            Cursor cursor = dbHelper.querySQL(sql, null);
+            if(cursor.moveToFirst()){
+                String tmp = cursor.getString(cursor.getColumnIndex("title"));
+                Log.i("MusicUtils", "false" + tmp);
+                return false;
+            }else{
+                Log.i("MusicUtils", "true");
+                return true;
+            }
+        }else{
+            return false;
+        }
+    }
+
 
     /**
      * 时间转换

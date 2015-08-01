@@ -21,6 +21,20 @@ public class Songinfo{
     //歌曲文件的大小 ：MediaStore.Audio.Media.SIZE
     private long size;
 
+    public Songinfo() {
+    }
+
+    public Songinfo(long id, String title, String album, long album_id, String artist, String url, int duration, long size) {
+        this.id = id;
+        this.title = title;
+        this.album = album;
+        this.album_id = album_id;
+        this.artist = artist;
+        this.url = url;
+        this.duration = duration;
+        this.size = size;
+    }
+
     public long getId() {
         return id;
     }

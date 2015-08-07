@@ -457,6 +457,7 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         deleteFromdb(songinfo.getTitle());
+                        Toast.makeText(PlayerActivity.this, "删除成功！", Toast.LENGTH_SHORT).show();
                         initSongList();
                         adapter.notifyDataSetChanged();
                         sendMusicBroadCast(MusicUtils.UPDATE_MUSIC_LIST);

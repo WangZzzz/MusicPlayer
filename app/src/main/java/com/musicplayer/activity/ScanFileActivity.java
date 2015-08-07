@@ -23,6 +23,8 @@ import com.musicplayer.util.MusicUtils;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class ScanFileActivity extends Activity implements View.OnClickListener{
 
@@ -100,16 +102,22 @@ public class ScanFileActivity extends Activity implements View.OnClickListener{
 
     private void initScanFiles(File file){
         scanFiles.clear();
-        adapter.notifyDataSetChanged();
+//        adapter.notifyDataSetChanged();
         currentPath = file.getAbsolutePath();
         File[] files = file.listFiles();
         for(File tmp : files){
             String fileName = tmp.getName();
+            if(fileName.startsWith(".")){
+                //去掉.开头的隐藏文件
+                continue;
+            }
             String filePath = tmp.getAbsolutePath();
             boolean isDirectory = tmp.isDirectory();
             ScanFile scanFile = new ScanFile(filePath, fileName, false, isDirectory);
             scanFiles.add(scanFile);
         }
+        Collections.sort(scanFiles, new FileComparator());
+        adapter.notifyDataSetChanged();
     }
     @Override
     public void onClick(View view) {
@@ -125,7 +133,8 @@ public class ScanFileActivity extends Activity implements View.OnClickListener{
                                 scanFile(new File(scanFile.getFilePath()));
                             }
                         }
-                        handler.sendEmptyMessage(1);
+                        //至少扫描两秒，防止闪屏
+                        handler.sendEmptyMessageDelayed(1, 2000);
                     }
                 }).start();
                 break;
@@ -225,5 +234,14 @@ public class ScanFileActivity extends Activity implements View.OnClickListener{
         intent.setAction(MusicUtils.MUSIC_SERVIE_CONTROL);
         intent.putExtra("control", i);
         sendBroadcast(intent);
+    }
+
+    //扫描到文件，按文件名排序用的
+    private class FileComparator implements Comparator<ScanFile>{
+
+        @Override
+        public int compare(ScanFile lhs, ScanFile rhs) {
+            return lhs.getFileName().toLowerCase().compareTo(rhs.getFileName().toLowerCase());
+        }
     }
 }
